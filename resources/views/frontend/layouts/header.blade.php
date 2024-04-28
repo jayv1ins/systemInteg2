@@ -220,7 +220,8 @@
                                                     href="{{ route('product-grids') }}">Products</a><span
                                                     class="new">New</span></li>
                                             {{ Helper::getHeaderCategory() }}
-
+                                            <li class="{{ Request::path() == 'wheel' ? 'active' : '' }}"><a
+                                                    href="{{ route('wheel') }}">Wheel</a></li>
 
                                             <li class="{{ Request::path() == 'contact' ? 'active' : '' }}"><a
                                                     href="{{ route('contact') }}">Contact Us</a></li>
