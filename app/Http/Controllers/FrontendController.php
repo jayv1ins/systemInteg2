@@ -19,6 +19,36 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 class FrontendController extends Controller
 {
+    public function test(){
+        return view('frontend.test');
+    }
+
+    public function claim(Request $request){
+            $request->validate([
+                'slug'      =>  'required',
+                'quant'      =>  'required',
+            ]);
+            // dd($request->quant[1]);
+            $product = Product::where('slug', $request->slug)->first();
+                $cart = new Cart;
+                $cart->user_id = auth()->user()->id;
+                $cart->product_id = $product->id;
+                $cart->price = $request->price;
+                $cart->quantity = $request->quant[1];
+                $cart->amount= $request->amount;
+
+                $cart->save();
+
+               return redirect('/cart');
+
+    }
+
+    public function perSpin(Request $request){
+        $user = auth()->user();
+        $user->wheelChance = $request->input('wheelChance');
+        $user->save();
+        return response()->json(['message' => 'Wheel chance updated successfully']);
+    }
 
     public function index(Request $request){
         return redirect()->route($request->user()->role);
@@ -40,6 +70,7 @@ class FrontendController extends Controller
                 ->with('category_lists',$category);
     }
     public function wheel(){
+        $user = Auth::user();
         $products=Product::query();
 
         if(!empty($_GET['category'])){
@@ -85,7 +116,7 @@ class FrontendController extends Controller
 
 
 
-        return view('frontend.pages.wheel')->with('products',$products)->with('recent_products',$recent_products);
+        return view('frontend.pages.wheel')->with('products',$products)->with('recent_products',$recent_products)->with('user',$user);
     }
     public function aboutUs(){
         return view('frontend.pages.about-us');

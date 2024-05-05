@@ -39,7 +39,9 @@
     // STORAGE LINKED ROUTE
     Route::get('storage-link',[AdminController::class,'storageLink'])->name('storage.link');
 
-
+    Route::get('test' , function (){
+        return "test";
+    });
     Auth::routes(['register' => false]);
 
     Route::get('user/login', [FrontendController::class, 'login'])->name('login.form');
@@ -59,6 +61,8 @@
 // Frontend Routes
     Route::get('/home', [FrontendController::class, 'index']);
     Route::get('/wheel', [FrontendController::class, 'wheel'])->name('wheel');
+    Route::post('/wheel/claiming',  [FrontendController::class, 'claim']);
+    Route::post('/wheel/perSpin',  [FrontendController::class, 'perSpin']);
     Route::get('/about-us', [FrontendController::class, 'aboutUs'])->name('about-us');
     Route::get('/contact', [FrontendController::class, 'contact'])->name('contact');
     Route::post('/contact/message', [MessageController::class, 'store'])->name('contact.store');
@@ -68,8 +72,10 @@
     Route::get('/product-sub-cat/{slug}/{sub_slug}', [FrontendController::class, 'productSubCat'])->name('product-sub-cat');
     Route::get('/product-brand/{slug}', [FrontendController::class, 'productBrand'])->name('product-brand');
 // Cart section
-    Route::get('/add-to-cart/{slug}', [CartController::class, 'addToCart'])->name('add-to-cart')->middleware('user');
-    Route::post('/add-to-cart', [CartController::class, 'singleAddToCart'])->name('single-add-to-cart')->middleware('user');
+    // Route::get('/test',  [FrontendController::class, 'test']);
+    // Route::post('/sendTest',  [FrontendController::class, 'claim']);
+    Route::get('/add-to-cart/{slug}', [CartController::class, 'addToCart'])->name('add-to-cart');
+    Route::post('/add-to-cart', [CartController::class, 'singleAddToCart'])->name('single-add-to-cart');
     Route::get('cart-delete/{id}', [CartController::class, 'cartDelete'])->name('cart-delete');
     Route::post('cart-update', [CartController::class, 'cartUpdate'])->name('cart.update');
 

@@ -160,9 +160,9 @@
                                                             $product->price -
                                                             ($product->price * $product->discount) / 100;
                                                     @endphp
-                                                    <span>${{ number_format($after_discount, 2) }}</span>
+                                                    <span>₱{{ number_format($after_discount, 2) }}</span>
                                                     <del
-                                                        style="padding-left:4%;">${{ number_format($product->price, 2) }}</del>
+                                                        style="padding-left:4%;">₱{{ number_format($product->price, 2) }}</del>
                                                 </div>
                                             </div>
                                         </div>
@@ -259,12 +259,12 @@
                                                 href="{{ route('product-detail', $product->slug) }}">{{ $product->title }}</a>
                                         </h3>
                                         <div class="product-price">
-                                            <span class="old">${{ number_format($product->price, 2) }}</span>
+                                            <span class="old">₱{{ number_format($product->price, 2) }}</span>
                                             @php
                                                 $after_discount =
                                                     $product->price - ($product->price * $product->discount) / 100;
                                             @endphp
-                                            <span>${{ number_format($after_discount, 2) }}</span>
+                                            <span>₱{{ number_format($after_discount, 2) }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -317,7 +317,7 @@
                                         <div class="col-lg-6 col-md-6 col-12 no-padding">
                                             <div class="content">
                                                 <h4 class="title"><a href="#">{{ $product->title }}</a></h4>
-                                                <p class="price with-discount">${{ number_format($product->discount, 2) }}
+                                                <p class="price with-discount">₱{{ number_format($product->discount, 2) }}
                                                 </p>
                                             </div>
                                         </div>
@@ -458,7 +458,7 @@
                                                 $product->price - ($product->price * $product->discount) / 100;
                                         @endphp
                                         <h3><small><del
-                                                    class="text-muted">${{ number_format($product->price, 2) }}</del></small>
+                                                    class="text-muted">₱{{ number_format($product->price, 2) }}</del></small>
                                             ${{ number_format($after_discount, 2) }} </h3>
                                         <div class="quickview-peragraph">
                                             <p>{!! html_entity_decode($product->summary) !!}</p>
@@ -585,7 +585,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script>
         /*==================================================================
-            [ Isotope ]*/
+                    [ Isotope ]*/
         var $topeContainer = $('.isotope-grid');
         var $filter = $('.filter-tope-group');
 

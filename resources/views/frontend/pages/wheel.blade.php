@@ -4,188 +4,42 @@
 
 @section('main-content')
     <!-- Product Style -->
-    <form action="{{ route('shop.filter') }}" method="POST">
-        @csrf
-        <section class="product-area shop-sidebar shop section">
+    <section class="product-area shop-sidebar shop section">
 
-            <div class="container">
-                <canvas id="wheel"></canvas>
-                <button id="spin-btn">Spin</button>
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKXlQ9iLTwjO7__KWDQWEdnZF75JpzNzSqNLtqypvyYSmvTHZK6Ufr90Z80lkBmFZ__1M&usqp=CAU"
-                    alt="spinner arrow" />
-            </div>
-            <div id="final-value">
-                <p>Click On The Spin Button To Start</p>
-            </div>
-            <div>
-                <p>saanto</p>
-                @if (count($products) > 0)
-                    @foreach ($products as $product)
-                        @php
-                            $photo = explode(',', $product->photo);
-                        @endphp
-                        <img class="default-img" src="{{ $photo[0] }}" alt="{{ $photo[0] }}">
+        <div class="container">
+            <canvas id="wheel"></canvas>
+            <button id="spin-btn">Spin</button>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKXlQ9iLTwjO7__KWDQWEdnZF75JpzNzSqNLtqypvyYSmvTHZK6Ufr90Z80lkBmFZ__1M&usqp=CAU"
+                alt="spinner arrow" />
+        </div>
+        <div id="final-value">
+            <p>Click On The Spin Button To Start</p>
+        </div>
 
-                        <h3><a href="{{ route('product-detail', $product->slug) }}">{{ $product->title }}</a></h3>
-                    @endforeach
-                @else
-                    <h4 class="text-warning" style="margin:100px auto;">There are no products.</h4>
-                @endif
-            </div>
-            <!-- Chart JS -->
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-            <!-- Chart JS Plugin for displaying text over chart -->
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.1.0/chartjs-plugin-datalabels.min.js">
-            </script>
-            <!-- Script -->
-            <script>
-                const wheel = document.getElementById("wheel");
-                const spinBtn = document.getElementById("spin-btn");
-                const finalValue = document.getElementById("final-value");
-                //Object that stores values of minimum and maximum angle for a value
-                const rotationValues = [{
-                        minDegree: 0,
-                        maxDegree: 30,
-                        value: 2
-                    },
-                    {
-                        minDegree: 31,
-                        maxDegree: 90,
-                        value: '{{ $products[0]->title }}'
-                    },
-                    {
-                        minDegree: 91,
-                        maxDegree: 150,
-                        value: 6
-                    },
-                    {
-                        minDegree: 151,
-                        maxDegree: 210,
-                        value: 5
-                    },
-                    {
-                        minDegree: 211,
-                        maxDegree: 270,
-                        value: 4
-                    },
-                    {
-                        minDegree: 271,
-                        maxDegree: 330,
-                        value: 3
-                    },
-                    {
-                        minDegree: 331,
-                        maxDegree: 360,
-                        value: 2
-                    },
-                ];
-                //Size of each piece
-                const data = [16, 16, 16, 16, 16, 16];
-                //background color for each piece
-                var pieColors = [
-                    "#8b35bc",
-                    "#b163da",
-                    "#8b35bc",
-                    "#b163da",
-                    "#8b35bc",
-                    "#b163da",
-                ];
-                //Create chart
-                let myChart = new Chart(wheel, {
-                    //Plugin for displaying text on pie chart
-                    plugins: [ChartDataLabels],
-                    //Chart Type Pie
-                    type: "pie",
-                    data: {
-                        //Labels(values which are to be displayed on chart)
-                        labels: [
-                            '{{ $products[0]->title }}',
-                            2, 3, 4, 5, 6
-                        ],
-                        //Settings for dataset/pie
-                        datasets: [{
-                            backgroundColor: pieColors,
-                            data: data,
-                        }, ],
-                    },
-                    options: {
-                        //Responsive chart
-                        responsive: true,
-                        animation: {
-                            duration: 0
-                        },
-                        plugins: {
-                            //hide tooltip and legend
-                            tooltip: false,
-                            legend: {
-                                display: false,
-                            },
-                            //display labels inside pie chart
-                            datalabels: {
-                                color: "#ffffff",
-                                formatter: (_, context) => context.chart.data.labels[context.dataIndex],
-                                font: {
-                                    size: 24
-                                },
-                            },
-                        },
-                    },
-                });
-                //display value based on the randomAngle
-                const valueGenerator = (angleValue) => {
-                    for (let i of rotationValues) {
-                        //if the angleValue is between min and max then display it
-                        if (angleValue >= i.minDegree && angleValue <= i.maxDegree) {
-                            finalValue.innerHTML = `<p>Value: ${i.value}</p>`;
-                            spinBtn.disabled = false;
-                            break;
-                        }
-                    }
-                };
-
-                //Spinner count
-                let count = 0;
-                //100 rotations for animation and last rotation for result
-                let resultValue = 101;
-                //Start spinning
-                spinBtn.addEventListener("click", () => {
-                    spinBtn.disabled = true;
-                    //Empty final value
-                    finalValue.innerHTML = `<p>Good Luck!</p>`;
-                    //Generate random degrees to stop at
-                    let randomDegree = Math.floor(Math.random() * (355 - 0 + 1) + 0);
-                    //Interval for rotation animation
-                    let rotationInterval = window.setInterval(() => {
-                        //Set rotation for piechart
-                        /*
-                        Initially to make the piechart rotate faster we set resultValue to 101 so it rotates 101 degrees at a time and this reduces by 1 with every count. Eventually on last rotation we rotate by 1 degree at a time.
-                        */
-                        myChart.options.rotation = myChart.options.rotation + resultValue;
-                        //Update chart with new value;
-                        myChart.update();
-                        //If rotation>360 reset it back to 0
-                        if (myChart.options.rotation >= 360) {
-                            count += 1;
-                            resultValue -= 5;
-                            myChart.options.rotation = 0;
-                        } else if (count > 15 && myChart.options.rotation == randomDegree) {
-                            valueGenerator(randomDegree);
-                            clearInterval(rotationInterval);
-                            count = 0;
-                            resultValue = 101;
-                        }
-                    }, 10);
-                });
-            </script>
-        </section>
-    </form>
-
-    <!--/ End Product Style 1  -->
-
-
+        <div class="claim-btn-container">
+            <form id="claimForm" action="/wheel/claiming" method="POST" class="">
+                @csrf
+                <input type="hidden" name="slug" id="productSlug" value="">
+                <input type="hidden" name="quant[1]" class="input-number" data-min="1" data-max="1000" value="1"
+                    id="quantity">
+                <input type="hidden" name="price" value="0">
+                <input type="hidden" name="amount" value="0">
+                <!-- Hidden input for quantity -->
+                <button type="submit" id="claimBtn" style="display: none;">Claim Now</button>
+            </form>
+        </div>
+    </section>
 @endsection
+
 @push('styles')
     <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
         .pagination {
             display: inline-flex;
         }
@@ -197,18 +51,6 @@
             padding: 8px 16px;
             margin-top: 10px;
             color: white;
-        }
-
-        * {
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
-            font-family: "Poppins", sans-serif;
-        }
-
-        body {
-            height: 100vh;
-            background: linear-gradient(135deg, #c3a3f1, #6414e9);
         }
 
         .wrapper {
@@ -227,8 +69,8 @@
 
         .container {
             position: relative;
-            width: 100%;
-            height: 100%;
+            width: 40%;
+            height: 40%;
         }
 
         #wheel {
@@ -286,72 +128,181 @@
                 right: -5%;
             }
         }
+
+        .claim-btn-container {
+            text-align: center;
+            margin-top: 20px;
+            margin-left: 915px;
+            /* Adjust as needed */
+        }
     </style>
 @endpush
-@push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
-    {{-- <script>
-        $('.cart').click(function(){
-            var quantity=1;
-            var pro_id=$(this).data('id');
-            $.ajax({
-                url:"{{route('add-to-cart')}}",
-                type:"POST",
-                data:{
-                    _token:"{{csrf_token()}}",
-                    quantity:quantity,
-                    pro_id:pro_id
-                },
-                success:function(response){
-                    console.log(response);
-					if(typeof(response)!='object'){
-						response=$.parseJSON(response);
-					}
-					if(response.status){
-						swal('success',response.msg,'success').then(function(){
-							document.location.href=document.location.href;
-						});
-					}
-                    else{
-                        swal('error',response.msg,'error').then(function(){
-							// document.location.href=document.location.href;
-						});
-                    }
-                }
-            })
-        });
-    </script> --}}
-    <script>
-        $(document).ready(function() {
-            /*----------------------------------------------------*/
-            /*  Jquery Ui slider js
-            /*----------------------------------------------------*/
-            if ($("#slider-range").length > 0) {
-                const max_value = parseInt($("#slider-range").data('max')) || 500;
-                const min_value = parseInt($("#slider-range").data('min')) || 0;
-                const currency = $("#slider-range").data('currency') || '';
-                let price_range = min_value + '-' + max_value;
-                if ($("#price_range").length > 0 && $("#price_range").val()) {
-                    price_range = $("#price_range").val().trim();
-                }
 
-                let price = price_range.split('-');
-                $("#slider-range").slider({
-                    range: true,
-                    min: min_value,
-                    max: max_value,
-                    values: price,
-                    slide: function(event, ui) {
-                        $("#amount").val(currency + ui.values[0] + " -  " + currency + ui.values[1]);
-                        $("#price_range").val(ui.values[0] + "-" + ui.values[1]);
+@push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.1.0/chartjs-plugin-datalabels.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const products = {!! json_encode($products) !!};
+        const productData = products.data || [];
+        const numProducts = productData.length;
+
+        const user = {!! json_encode($user) !!};
+        const wheelChance = user.wheelChance;
+        console.log("wheelChance: ", wheelChance);
+
+        const rotationValues = [];
+        const degreeStep = 360 / (numProducts + 1); // Adding 1 for the "Try Again" option
+
+        productData.forEach((product, index) => {
+            rotationValues.push({
+                minDegree: index * degreeStep,
+                maxDegree: (index + 1) * degreeStep,
+                value: product.title,
+                image: product.photo.replace(/\\/g, ''), // Assuming photo is a comma-separated string
+                slug: "{{ route('product-detail', '') }}" + "/" + product
+                    .slug // Adjust as per your route structure
+            });
+        });
+
+        // Adding a "Try Again" option
+        rotationValues.push({
+            minDegree: numProducts * degreeStep,
+            maxDegree: 360,
+            value: "Try Again",
+            image: "",
+            slug: ""
+        });
+        rotationValues.push({
+            minDegree: numProducts * degreeStep,
+            maxDegree: 360,
+            value: "Try Again",
+            image: "",
+            slug: ""
+        });
+
+        const data = Array(numProducts + 2).fill(1); // Adding 1 for the "Try Again" option
+
+        const wheel = document.getElementById("wheel");
+        const spinBtn = document.getElementById("spin-btn");
+        const finalValue = document.getElementById("final-value");
+
+        const myChart = new Chart(wheel, {
+            plugins: [ChartDataLabels],
+            type: "pie",
+            data: {
+                labels: rotationValues.map(value => value.value),
+                datasets: [{
+                    backgroundColor: [
+                        "#F7941D",
+                        "#424646",
+                        // Add more colors if needed
+                    ],
+
+
+                    data: data,
+                }, ],
+            },
+            options: {
+                cutout: "50%",
+                responsive: true,
+                animation: {
+                    duration: 0
+                },
+                plugins: {
+                    tooltip: false,
+                    legend: {
+                        display: false,
+                    },
+                    datalabels: {
+                        color: "#ffffff",
+                        formatter: (_, context) => context.chart.data.labels[context.dataIndex],
+                        font: {
+                            size: 18,
+                        },
+
+
+                    },
+                },
+            },
+        });
+
+
+        const updateHiddenFields = (slug) => {
+            document.getElementById('productSlug').value = slug;
+            console.log("Product slug: ", slug);
+        };
+
+        const cartRoute = "{{ route('cart') }}";
+        const valueGenerator = (angleValue) => {
+            for (let i of rotationValues) {
+                if (angleValue >= i.minDegree && angleValue <= i.maxDegree) {
+                    if (i.value != "Try Again") {
+                        console.log("You won the product: ", i.slug);
+                        const slug = i.slug.replace("http://127.0.0.1:8000/product-detail/", "");
+                        finalValue.innerHTML = `<p>Congrats, you won the product: ${i.value}</p>`;
+
+                        updateHiddenFields(slug, 1); // Update the quantity dynamically if needed
+                        document.getElementById("claimBtn").style.display = "block"; // or "inline"
+
+
+                    } else {
+                        finalValue.innerHTML = `<p>Please try again. Maybe next time you will win a product.</p>`;
                     }
-                });
+                    spinBtn.disabled = false;
+                    break;
+                }
             }
-            if ($("#amount").length > 0) {
-                const m_currency = $("#slider-range").data('currency') || '';
-                $("#amount").val(m_currency + $("#slider-range").slider("values", 0) +
-                    "  -  " + m_currency + $("#slider-range").slider("values", 1));
-            }
-        })
+        };
+
+
+        let count = 0;
+        let resultValue = 101;
+
+        if (wheelChance == 0) {
+            finalValue.innerHTML = `<p>You don't have a wheel point to spin!<br> Please buy point or use coupon</p>`;
+            spinBtn.disabled = false;
+        } else {
+            const spinWheel = () => {
+                spinBtn.disabled = true;
+                const perSpin = user.wheelChance - 1;
+
+                axios.post('/wheel/perSpin', {
+                        wheelChance: perSpin
+                    }, {
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Assuming you are using Laravel CSRF protection
+                        }
+                    })
+                    .then(response => {
+                        spinBtn.removeEventListener("click",
+                            spinWheel); // Remove event listener after successful spin
+
+                        finalValue.innerHTML = `<p>Good Luck!</p>`;
+                        let randomDegree = Math.floor(Math.random() * (355 - 0 + 1) + 0);
+                        let rotationInterval = window.setInterval(() => {
+                            myChart.options.rotation = myChart.options.rotation + resultValue;
+                            myChart.update();
+                            if (myChart.options.rotation >= 360) {
+                                count += 1;
+                                resultValue -= 5;
+                                myChart.options.rotation = 0;
+                            } else if (count > 15 && myChart.options.rotation == randomDegree) {
+                                valueGenerator(randomDegree);
+                                clearInterval(rotationInterval);
+                                count = 0;
+                                resultValue = 101;
+                            }
+                        }, 10);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            };
+
+            // Add event listener for spin button
+            spinBtn.addEventListener("click", spinWheel);
+        }
     </script>
 @endpush
