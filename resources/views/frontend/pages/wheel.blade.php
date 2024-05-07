@@ -149,8 +149,10 @@
         const numProducts = productData.length;
 
         const user = {!! json_encode($user) !!};
-        const wheelChance = user.wheelChance;
+        const wheelChance = user?.wheelChance || 0;
+
         console.log("wheelChance: ", wheelChance);
+
 
         const rotationValues = [];
         const degreeStep = 360 / (numProducts + 1); // Adding 1 for the "Try Again" option
@@ -259,50 +261,56 @@
 
         let count = 0;
         let resultValue = 101;
-
-        if (wheelChance == 0) {
-            finalValue.innerHTML = `<p>You don't have a wheel point to spin!<br> Please buy point or use coupon</p>`;
-            spinBtn.disabled = false;
+        if (!user) {
+            // If the user is a guest, display the message
+            finalValue.innerHTML = `<p>Please login to spin the wheel!</p>`;
+            spinBtn.disabled = true;
         } else {
-            const spinWheel = () => {
-                spinBtn.disabled = true;
-                const perSpin = user.wheelChance - 1;
+            // If the user is authenticated, proceed with the wheel logic
+            if (wheelChance == 0) {
+                finalValue.innerHTML = `<p>You don't have a wheel point to spin!<br> Please buy point or use coupon</p>`;
+                spinBtn.disabled = false;
+            } else {
+                const spinWheel = () => {
+                    spinBtn.disabled = true;
+                    const perSpin = user.wheelChance - 1;
 
-                axios.post('/wheel/perSpin', {
-                        wheelChance: perSpin
-                    }, {
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Assuming you are using Laravel CSRF protection
-                        }
-                    })
-                    .then(response => {
-                        spinBtn.removeEventListener("click",
-                            spinWheel); // Remove event listener after successful spin
-
-                        finalValue.innerHTML = `<p>Good Luck!</p>`;
-                        let randomDegree = Math.floor(Math.random() * (355 - 0 + 1) + 0);
-                        let rotationInterval = window.setInterval(() => {
-                            myChart.options.rotation = myChart.options.rotation + resultValue;
-                            myChart.update();
-                            if (myChart.options.rotation >= 360) {
-                                count += 1;
-                                resultValue -= 5;
-                                myChart.options.rotation = 0;
-                            } else if (count > 15 && myChart.options.rotation == randomDegree) {
-                                valueGenerator(randomDegree);
-                                clearInterval(rotationInterval);
-                                count = 0;
-                                resultValue = 101;
+                    axios.post('/wheel/perSpin', {
+                            wheelChance: perSpin
+                        }, {
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}' // Assuming you are using Laravel CSRF protection
                             }
-                        }, 10);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            };
+                        })
+                        .then(response => {
+                            spinBtn.removeEventListener("click",
+                                spinWheel); // Remove event listener after successful spin
 
-            // Add event listener for spin button
-            spinBtn.addEventListener("click", spinWheel);
+                            finalValue.innerHTML = `<p>Good Luck!</p>`;
+                            let randomDegree = Math.floor(Math.random() * (355 - 0 + 1) + 0);
+                            let rotationInterval = window.setInterval(() => {
+                                myChart.options.rotation = myChart.options.rotation + resultValue;
+                                myChart.update();
+                                if (myChart.options.rotation >= 360) {
+                                    count += 1;
+                                    resultValue -= 5;
+                                    myChart.options.rotation = 0;
+                                } else if (count > 15 && myChart.options.rotation == randomDegree) {
+                                    valueGenerator(randomDegree);
+                                    clearInterval(rotationInterval);
+                                    count = 0;
+                                    resultValue = 101;
+                                }
+                            }, 10);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                };
+
+                // Add event listener for spin button
+                spinBtn.addEventListener("click", spinWheel);
+            }
         }
     </script>
 @endpush
