@@ -8,7 +8,8 @@ namespace Srmklive\PayPal\Providers;
  */
 
 use Illuminate\Support\ServiceProvider;
-use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use Srmklive\PayPal\Services\AdaptivePayments;
+use Srmklive\PayPal\Services\ExpressCheckout;
 
 class PayPalServiceProvider extends ServiceProvider
 {
@@ -54,8 +55,12 @@ class PayPalServiceProvider extends ServiceProvider
      */
     private function registerPayPal()
     {
-        $this->app->singleton('paypal_client', static function () {
-            return new PayPalClient();
+        $this->app->singleton('express_checkout', static function () {
+            return new ExpressCheckout();
+        });
+
+        $this->app->singleton('adaptive_payments', static function () {
+            return new AdaptivePayments();
         });
     }
 
